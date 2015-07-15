@@ -3,7 +3,7 @@
 import json
 import uuid
 
-from bottle import route, run, abort, post, get, request, HTTPResponse, template
+from bottle import run, abort, post, get, request, HTTPResponse, template
 
 MEDIA = None
 MEDIA_TYPE = None

@@ -4,6 +4,6 @@
         "url": "localhost",
         "port": 8080
     },
-    "user_endpoint": "/examplepage",
+    "user_endpoint": "/resolve/",
     "done_endpoint": "/done"
 }

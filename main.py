@@ -8,6 +8,7 @@ from bottle import route, run, abort, post, get, request, HTTPResponse, template
 MEDIA = None
 MEDIA_TYPE = None
 EVENTS_URL = None
+USER_URL = None
 
 STATIC_PAGES = {}
 
@@ -19,6 +20,10 @@ def load_config(config_file):
 # {} -> {}
 @post('/api/help/image')
 def process_help():
+    global MEDIA
+    global MEDIA_TYPE
+    global EVENTS_URL
+
     MEDIA = request.json['media']['content']
     MEDIA_TYPE = request.json['media']['type']
     EVENTS_URL = request.json['eventsURL']
@@ -28,6 +33,8 @@ def process_help():
     return {"userURL": USER_URL, "doneURL": DONE_URL}
 
 def generate_static_page():
+    global USER_URL
+
     if MEDIA_TYPE == 'url':
         static_page_html = template('static_user_page_by_url', media_url=MEDIA)
         a_new_uuid = generate_page_uuid()

@@ -12,10 +12,12 @@ USER_URL = None
 
 STATIC_PAGES = {}
 
+
 # -> {}
 def load_config(config_file):
     with open(config_file, 'r') as config:
         return json.load(config)
+
 
 # {} -> {}
 @post('/api/help/image')
@@ -32,6 +34,7 @@ def process_help():
 
     return {"userURL": USER_URL, "doneURL": DONE_URL}
 
+
 def generate_static_page():
     global USER_URL
 
@@ -41,8 +44,10 @@ def generate_static_page():
         STATIC_PAGES[a_new_uuid] = static_page_html
         USER_URL = host + config['user_endpoint'] + a_new_uuid
 
+
 def generate_page_uuid():
     return str(uuid.uuid4())
+
 
 @get('/resolve/<an_uuid>')
 def serve_static_page(an_uuid):
@@ -58,6 +63,7 @@ def stop_help():
     return HTTPResponse(status=200) \
         if request.json and request.json['authURL'] == USER_URL \
         else HTTPResponse(status=403, body="Auth url doesn't match!")
+
 
 if __name__ == "__main__":
     config = load_config('config.json')

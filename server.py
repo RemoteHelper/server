@@ -1,55 +1,65 @@
 #!/usr/bin/env python3
 
-import json
+import config as configuration
+from page_generator import PageGenerator
 
 from bottle import run, abort, post, get, request, HTTPResponse
 
-from page_generator import PageGenerator
 
-
-page_generator = PageGenerator()
-EVENTS_URL = None
-STATIC_PAGES = {}
-USER_URL = None
-
-# -> {}
-def load_config(config_file):
-    with open(config_file, 'r') as config:
-        return json.load(config)
-
-
-# {} -> {}
 @post('/api/help/image')
 def process_help():
-    global MEDIA_TYPE
-    global EVENTS_URL
-    global USER_URL
+    result = request.json
 
-    media_url = request.json['media']['content']
-    EVENTS_URL = request.json['eventsURL']
-    
-    id = page_generator.generate_page(media_url)
-    USER_URL = host + '/resolve/' + page_generator.retrieve_page(id)
-    return {"userURL": USER_URL, "doneURL": DONE_URL}
+    media_type = 'image'
+    media_url = result['media']['content']
+
+    page_id = page_generator.generate_page(media_url, media_type)
+    user_url = config.get_user_endpoint() + page_id
+
+    done_url = config.get_done_url()
+
+    return {
+        "userURL": user_url,
+        "doneURL": done_url
+    }
 
 
-@get('/resolve/<an_uuid>')
-def serve_static_page(an_uuid):
-    if page_generator.has_generated(an_uuid):
-        return page_generator.retrieve_page(an_uuid)
+@get('/resolve/<page_id>')
+def serve_static_page(page_id):
+    if not page_generator.has_generated(page_id):
+        abort(404, 'Not found')
 
-    abort(404, 'Not found')
+    return page_generator.retrieve_page(page_id)
 
-# {} -> Response[status: Either<200|403> body?]
+
 @post('/api/done')
 def stop_help():
-    return HTTPResponse(status=200) \
-        if request.json and request.json['authURL'] == USER_URL \
-        else HTTPResponse(status=403, body="Auth URL doesn't match!")
+    """
+    Stop forwarding events to the client.
+
+    Receives the user url that the client was to unsubscribe from,
+    if the url does not matches one we provided, respond with an 403
+    error code, else return OK
+    """
+
+    if not request.json:
+        return HTTPResponse(status=400)
+
+    user_url = request.json['authURL']
+    if user_url.endswith('/'):
+        user_url = user_url[:-1]
+
+    page_id = user_url.split('/')[-1]
+
+    if not page_generator.has_generated(page_id):
+        return HTTPResponse(status=403, body="Auth URL doesn't match!")
+
+    page_generator.remove_page(page_id)
+    return HTTPResponse(status=200)
 
 
 if __name__ == "__main__":
-    config = load_config('config.json')
-    host = config['host']['protocol'] + config['host']['url'] + ":" + str(config['host']['port'])
-    DONE_URL = host + config['done_endpoint']
-    run(host=config['host']['url'], port=config['host']['port'], debug=True)
+    config = configuration.Config('config.json')
+    page_generator = PageGenerator()
+
+    run(host=config.get_domain_name(), port=config.get_domain_port(), debug=True)

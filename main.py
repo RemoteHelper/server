@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
 import json
-import uuid
 
-from bottle import run, abort, post, get, request, HTTPResponse, template
+from bottle import run, abort, post, get, request, HTTPResponse
 
-MEDIA = None
-MEDIA_TYPE = None
+from page_generator import PageGenerator
+
+
+page_generator = PageGenerator()
 EVENTS_URL = None
-USER_URL = None
-
 STATIC_PAGES = {}
-
 
 # -> {}
 def load_config(config_file):
@@ -22,47 +20,30 @@ def load_config(config_file):
 # {} -> {}
 @post('/api/help/image')
 def process_help():
-    global MEDIA
     global MEDIA_TYPE
     global EVENTS_URL
 
-    MEDIA = request.json['media']['content']
-    MEDIA_TYPE = request.json['media']['type']
+    media_url = request.json['media']['content']
     EVENTS_URL = request.json['eventsURL']
-
-    generate_static_page()
-
-    return {"userURL": USER_URL, "doneURL": DONE_URL}
-
-
-def generate_static_page():
-    global USER_URL
-
-    if MEDIA_TYPE == 'url':
-        static_page_html = template('static_user_page_by_url', media_url=MEDIA)
-        a_new_uuid = generate_page_uuid()
-        STATIC_PAGES[a_new_uuid] = static_page_html
-        USER_URL = host + config['user_endpoint'] + a_new_uuid
-
-
-def generate_page_uuid():
-    return str(uuid.uuid4())
+    
+    id = page_generator.generate_page(media_url)
+    user_url = host + '/resolve/' + page_generator.retrieve_page(id)
+    return {"userURL": user_url, "doneURL": DONE_URL}
 
 
 @get('/resolve/<an_uuid>')
 def serve_static_page(an_uuid):
-    if an_uuid in STATIC_PAGES:
-        return STATIC_PAGES[an_uuid]
+    if page_generator.has_generated(an_uuid):
+        return page_generator.retrieve_page(an_uuid)
 
     abort(404, 'Not found')
-
 
 # {} -> Response[status: Either<200|403> body?]
 @post('/api/done')
 def stop_help():
     return HTTPResponse(status=200) \
         if request.json and request.json['authURL'] == USER_URL \
-        else HTTPResponse(status=403, body="Auth url doesn't match!")
+        else HTTPResponse(status=403, body="Auth URL doesn't match!")
 
 
 if __name__ == "__main__":

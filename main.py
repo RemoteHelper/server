@@ -10,6 +10,7 @@ from page_generator import PageGenerator
 page_generator = PageGenerator()
 EVENTS_URL = None
 STATIC_PAGES = {}
+USER_URL = None
 
 # -> {}
 def load_config(config_file):
@@ -22,13 +23,14 @@ def load_config(config_file):
 def process_help():
     global MEDIA_TYPE
     global EVENTS_URL
+    global USER_URL
 
     media_url = request.json['media']['content']
     EVENTS_URL = request.json['eventsURL']
     
     id = page_generator.generate_page(media_url)
-    user_url = host + '/resolve/' + page_generator.retrieve_page(id)
-    return {"userURL": user_url, "doneURL": DONE_URL}
+    USER_URL = host + '/resolve/' + page_generator.retrieve_page(id)
+    return {"userURL": USER_URL, "doneURL": DONE_URL}
 
 
 @get('/resolve/<an_uuid>')

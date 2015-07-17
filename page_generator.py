@@ -8,24 +8,33 @@ from bottle import template
 class PageGenerator:
     def __init__(self):
         self._pages = {}
-    
+
+    # -> UUID
+    def __uuid(self):
+        return str(uuid.uuid4())
+
+    # URL -> String -> UUID
     def generate_page(self, client_url, media_type):
-        id = self.__uuid()
+        page_id = self.__uuid()
+
         if media_type == 'image':
             template_src = 'simple_image_page'
-        elif media_type == 'video':
+        else:
             template_src = 'simple_video_page'
             
         page_content = template(template_src, media_url=client_url)
-        self._pages[id] = page_content
+        self._pages[page_id] = page_content
         
-        return id
-    
-    def __uuid(self):
-        return str(uuid.uuid4())
-        
+        return page_id
+
+    # UUID -> HTML
     def retrieve_page(self, page_id):
         return self._pages.get(page_id)
 
-    def has_generated(self, id):
-        return id in self._pages
+    # UUID -> Boolean
+    def has_generated(self, page_id):
+        return page_id in self._pages
+
+    # UUID ->
+    def remove_page(self, page_id):
+        self._pages.pop(page_id)

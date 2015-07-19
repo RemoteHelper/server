@@ -5,5 +5,5 @@
         "port": 8080
     },
     "user_endpoint": "/resolve/",
-    "done_endpoint": "/done"
+    "done_endpoint": "/api/done"
 }

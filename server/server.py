@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import config as configuration
-from page_generator import PageGenerator
-
 from bottle import run, abort, post, get, request, HTTPResponse
+
+import page_generator
+import config as configuration
 
 
 @post('/api/help/image')
@@ -60,6 +60,6 @@ def stop_help():
 
 if __name__ == "__main__":
     config = configuration.Config('config.json')
-    page_generator = PageGenerator()
+    page_generator = page_generator.PageGenerator()
 
     run(host=config.get_domain_name(), port=config.get_domain_port(), debug=True)

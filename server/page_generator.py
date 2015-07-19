@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import uuid
+import os.path
 
 from bottle import template
 
@@ -8,6 +9,7 @@ from bottle import template
 class PageGenerator:
     def __init__(self):
         self._pages = {}
+        self.base_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
     # -> UUID
     def __uuid(self):
@@ -18,11 +20,11 @@ class PageGenerator:
         page_id = self.__uuid()
 
         if media_type == 'image':
-            template_src = 'simple_image_page'
+            tpl_file = os.path.join(self.base_path, 'templates/simple_image_page')
         else:
-            template_src = 'simple_video_page'
-            
-        page_content = template(template_src, media_url=client_url)
+            tpl_file = os.path.join(self.base_path, 'templates/simple_video_page')
+
+        page_content = template(tpl_file, media_url=client_url)
         self._pages[page_id] = page_content
         
         return page_id

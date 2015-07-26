@@ -1,0 +1,14 @@
+body {
+    width: 99vw;
+    text-align: center;
+}
+
+#media-container {
+    margin: 0 auto;
+}
+
+#media-container > img,
+#media-container > video {
+    width: 100%;
+    height: auto;
+}

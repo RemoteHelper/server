@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
-from bottle import run, abort, post, get, request, HTTPResponse
+from bottle import run, abort, post, get, request, HTTPResponse, static_file
 
 import config
 import storage
 import page_generator
+
+
+@get('/static/<filename:re:.*\.css>')
+def get_css(filename):
+    return static_file(filename, root='./static')
 
 
 @post('/api/help/image')

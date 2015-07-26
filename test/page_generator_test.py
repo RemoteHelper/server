@@ -12,7 +12,7 @@ class PageGeneratorTest(unittest.TestCase):
         self.assertEqual(generator.generate_page('some_url', 'image'),
                          template(image_template_path, media_url='some_url'))
 
-    def test_generating_a_video_page_should_return_the_image_template_with_the_supplied_url(self):
+    def test_generating_a_video_page_should_return_the_video_template_with_the_supplied_url(self):
         self.assertEqual(generator.generate_page('some_url', 'video'),
                          template(video_template_path, media_url='some_url'))
 

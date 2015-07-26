@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-job_completed = False
 
+class Job:
+    def __init__(self):
+        self._completed = False
 
-def complete_job():
-    global job_completed
-    job_completed = True
+    def complete_job(self):
+        self._completed = True
 
-
-def is_complete():
-    return job_completed
+    def is_complete(self):
+        return self._completed

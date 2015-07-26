@@ -94,5 +94,6 @@ def stop_help():
 
 
 if __name__ == "__main__":
+    job = job.Job()
     storage = storage.Storage()
     run(host=config.get_domain_name(), port=config.get_domain_port(), debug=True)

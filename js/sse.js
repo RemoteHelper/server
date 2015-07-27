@@ -17,7 +17,7 @@
         console.log(response);
         // Tell the user to get the f*ck out
         // close the stream, we no longer need it
-        source.close()
+        source.close();
     });
 
 

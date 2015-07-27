@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-from bottle import run, abort, post, get, request, HTTPResponse, static_file
+from bottle import run, abort, post, get, request, HTTPResponse, static_file, response
 
+import job
 import config
 import storage
 import page_generator
@@ -10,6 +11,36 @@ import page_generator
 @get('/static/<filename:re:.*\.css>')
 def get_css(filename):
     return static_file(filename, root='./static')
+
+
+@get('/js/<filename:re:.*\.js>')
+def get_js(filename):
+    return static_file(filename, root='./js')
+
+
+@get('/api/stream')
+def stream():
+    """
+    Server-Sent Events endpoint for the server
+
+    Notifies the browser that we're done and that it should stop forwarding
+    events.
+
+    It should also notify the user of the next step
+    (e.g. close the tab)
+    """
+
+    response.content_type = 'text/event-stream'
+    response.cache_control = 'no-cache'
+
+    # make the user page reconnect in 5s whenever the connection closes
+    yield 'retry: 5000\n'
+
+    if job.is_complete():
+        # send the browser the 'jobcomplete' message
+        # the browser should then notify the user of this
+        yield 'event: jobcomplete\n' + \
+              'data: {"done":true}\n\n'
 
 
 @post('/api/help/image')
@@ -61,10 +92,13 @@ def stop_help():
     if not storage.contains(page_id):
         return HTTPResponse(status=403, body="Auth URL doesn't match!")
 
+    job.complete_job()
     storage.remove_page(page_id)
+
     return HTTPResponse(status=200)
 
 
 if __name__ == "__main__":
+    job = job.Job()
     storage = storage.Storage()
     run(host=config.get_domain_name(), port=config.get_domain_port(), debug=True)

@@ -11,7 +11,7 @@ import filters
 import storage
 import page_generator
 
-events_url = None
+job = None
 
 
 @get('/static/<filename:re:.*\.css>')
@@ -42,6 +42,7 @@ def receive_events():
     if event_filter.blocks(event):
         return HTTPResponse(status=100)
 
+    events_url = job.get_events_url()
     if events_url is None or not _valid_event(event):
         return HTTPResponse(status=400)
 
@@ -119,7 +120,7 @@ def stream():
 
 @post('/api/help/image')
 def process_help():
-    global events_url
+    global job
 
     result = request.json
 
@@ -127,6 +128,7 @@ def process_help():
     media_url = result['media']['content']
 
     events_url = request['eventsURL']
+    job = job.Job(events_url)
 
     page_content = page_generator.generate_page(media_url, media_type)
     page_id = storage.save_page(page_content)
@@ -177,7 +179,6 @@ def stop_help():
 
 
 if __name__ == "__main__":
-    job = job.Job()
     storage = storage.Storage()
     event_filter = filters.DefaultFilter()
 

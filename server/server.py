@@ -118,9 +118,10 @@ def process_help():
         return HTTPResponse(status=400)
 
     media_type = 'image'
-    media_url = result['media']['content']
 
+    media_url = result['mediaURL']
     events_url = result['eventsURL']
+
     current_job = job.Job(events_url)
 
     page_content = page_generator.generate_page(media_url, media_type)

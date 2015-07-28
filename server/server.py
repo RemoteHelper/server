@@ -10,6 +10,7 @@ import config
 import filters
 import storage
 import page_generator
+import schema_validator as sv
 
 current_job = None
 
@@ -39,33 +40,20 @@ def receive_events():
     """
     event = request.json
 
-    if not event or current_job is None:
+    if not event or not sv.valid_event(event) or current_job is None:
         return HTTPResponse(status=400)
 
     if event_filter.blocks(event):
         return HTTPResponse(status=100)
 
     events_url = current_job.get_events_url()
-    if events_url is None or not _valid_event(event):
+
+    if events_url is None:
         return HTTPResponse(status=400)
 
     client_response = forward(events_url, event)
 
     return client_response if client_response else HTTPResponse(status=100)
-
-
-def _valid_event(event):
-    """
-    Specifies if a given event is valid according to the spec
-
-    _valid_event :: {} -> Bool
-
-    Event should be exactly {'media': {'type': Any, 'content': [Any]}}
-    """
-    return {'media'} == set(event.keys()) and \
-        isinstance(event['media'], dict) and \
-        {'content', 'type'} == set(event['media'].keys()) and \
-        isinstance(event['media']['content'], list)
 
 
 def forward(destination, event):
@@ -93,7 +81,7 @@ def forward(destination, event):
     if not result:
         return None
 
-    return result if _valid_event(result) else None
+    return result if sv.valid_media(result) else None
 
 
 @get('/api/stream')
@@ -126,6 +114,8 @@ def process_help():
     global current_job
 
     result = request.json
+    if not result or not sv.valid_help_request(result):
+        return HTTPResponse(status=400)
 
     media_type = 'image'
     media_url = result['media']['content']
@@ -163,7 +153,7 @@ def stop_help():
     error code, else return OK
     """
 
-    if not request.json or current_job is None:
+    if not request.json or 'authURL' not in request.json or current_job is None:
         return HTTPResponse(status=400)
 
     user_url = request.json['authURL']

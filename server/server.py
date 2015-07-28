@@ -11,7 +11,7 @@ import filters
 import storage
 import page_generator
 
-job = None
+current_job = None
 
 
 @get('/static/<filename:re:.*\.css>')
@@ -39,10 +39,13 @@ def receive_events():
     """
     event = request.json
 
+    if not event or current_job is None:
+        return HTTPResponse(status=400)
+
     if event_filter.blocks(event):
         return HTTPResponse(status=100)
 
-    events_url = job.get_events_url()
+    events_url = current_job.get_events_url()
     if events_url is None or not _valid_event(event):
         return HTTPResponse(status=400)
 
@@ -111,7 +114,7 @@ def stream():
     # make the user page reconnect in 5s whenever the connection closes
     yield 'retry: 5000\n'
 
-    if job.is_complete():
+    if current_job is not None and current_job.is_complete():
         # send the browser the 'jobcomplete' message
         # the browser should then notify the user of this
         yield 'event: jobcomplete\n' + \
@@ -120,15 +123,15 @@ def stream():
 
 @post('/api/help/image')
 def process_help():
-    global job
+    global current_job
 
     result = request.json
 
     media_type = 'image'
     media_url = result['media']['content']
 
-    events_url = request['eventsURL']
-    job = job.Job(events_url)
+    events_url = result['eventsURL']
+    current_job = job.Job(events_url)
 
     page_content = page_generator.generate_page(media_url, media_type)
     page_id = storage.save_page(page_content)
@@ -160,7 +163,7 @@ def stop_help():
     error code, else return OK
     """
 
-    if not request.json:
+    if not request.json or current_job is None:
         return HTTPResponse(status=400)
 
     user_url = request.json['authURL']
@@ -172,7 +175,7 @@ def stop_help():
     if not storage.contains(page_id):
         return HTTPResponse(status=403, body="Auth URL doesn't match!")
 
-    job.complete_job()
+    current_job.complete_job()
     storage.remove_page(page_id)
 
     return HTTPResponse(status=200)

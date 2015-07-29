@@ -10,6 +10,8 @@ $(document).ready(function() {
     nameOfMouseButton[3] = 'right';
 
 
+
+    /* Mouse event handling */
     var mouseHandler = function(event) {
         notifyEvent(pickMouseEventData(event));
     };
@@ -21,10 +23,14 @@ $(document).ready(function() {
             data: JSON.stringify(eventData),
             contentType: 'application/json',
             success: function(responseData, statusCode) {
+                console.log(responseData.statusCode);
                 if (statusCode !== '200') return;
 
                 var newMediaUrl = responseData.media.content;
                 $(MAIN_MEDIA_ID).attr('src', newMediaUrl);
+            },
+            error: function() {
+                console.log(arguments);
             }
         });
     };
@@ -51,6 +57,7 @@ $(document).ready(function() {
 
 
 
+    /* Keyboard events handler */
     var keydownHandler = function(event) {
         if (isJustAModifierKey(event)) return;
 
@@ -83,7 +90,7 @@ $(document).ready(function() {
 
 
 
-
+    /* Hook handlers */
     $(MAIN_MEDIA_ID).mousedown(mouseHandler);
     $(MAIN_MEDIA_ID).mouseup(mouseHandler);
 

@@ -33,7 +33,9 @@ def receive_events():
     Filters them according to the default filter set, and then forwards
     them to the client
 
-    Returns: 100 | 200
+    If a payload is sent, the user should update old content with the payload
+
+    Returns: 200
     Payload: {}?
     """
     event = request.json
@@ -42,7 +44,7 @@ def receive_events():
         return HTTPResponse(status=400)
 
     if event_filter.blocks(event):
-        return HTTPResponse(status=100)
+        return HTTPResponse(status=200)
 
     events_url = current_job.get_events_url()
 
@@ -51,7 +53,7 @@ def receive_events():
 
     client_response = forward(events_url, event)
 
-    return client_response if client_response else HTTPResponse(status=100)
+    return client_response if client_response else HTTPResponse(status=200)
 
 
 def forward(destination, event):
@@ -60,8 +62,8 @@ def forward(destination, event):
 
     forward :: {} -> {}?
 
-    The client can then reply with 100 Continue, in which case we return None,
-    or 200 and a media payload, in which case we return the media payload
+    The client can then reply with an empty body, in which case we return None,
+    or a media payload, in which case we return the media payload
 
     If the payload is wrong, return None
     """
@@ -75,14 +77,13 @@ def forward(destination, event):
 
     status = r.status_code
 
-    if status == 100:
+    if status != 200:
         return None
 
-    # else the status is 200
+    if not r.text or r.json() is None:
+        return None
+
     result = r.json()
-    if not result:
-        return None
-
     return result if sv.valid_media(result) else None
 
 

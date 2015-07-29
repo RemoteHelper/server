@@ -5,6 +5,7 @@ class DefaultFilter():
     def __init__(self):
         self._filter = [
             (87,    ('ctrlKey',)),              # ^W
+            (87,    ('metaKey',)),              # ⌘W
             (87,    ('ctrlKey', 'shiftKey')),   # shift + ^W
 
             (81,    ('ctrlKey',)),              # ^Q

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import json
-
 import requests
 from bottle import run, abort, post, get, request, HTTPResponse, static_file, response
 
@@ -69,7 +67,11 @@ def forward(destination, event):
     """
 
     payload = event
-    r = requests.post(destination, data=json.dumps(payload))
+    try:
+        r = requests.post(destination, json=payload, timeout=10)
+    except requests.Timeout as e:
+        print('Timeout error: {}'.format(e))
+        raise e
 
     status = r.status_code
 

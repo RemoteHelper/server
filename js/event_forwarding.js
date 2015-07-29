@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    "use strict";
+
     var EVENTS_ENDPOINT = '/events';
     var MAIN_MEDIA_ID = '#main-media';
 

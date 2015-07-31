@@ -22,11 +22,9 @@ $(document).ready(function() {
             url: EVENTS_ENDPOINT,
             data: JSON.stringify(eventData),
             contentType: 'application/json',
-            success: function(responseData, statusCode) {
-                console.log(responseData.statusCode);
-                if (statusCode !== '200') return;
-
-                var newMediaUrl = responseData.media.content;
+            dataType: "json",
+            success: function(responseData) {
+                var newMediaUrl = responseData['mediaURL'] + '?' + Math.random();
                 $(MAIN_MEDIA_ID).attr('src', newMediaUrl);
             },
             error: function() {

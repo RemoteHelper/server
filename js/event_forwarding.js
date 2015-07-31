@@ -17,6 +17,8 @@ $(document).ready(function() {
     };
 
     var notifyEvent = function(eventData) {
+        if (RemoteHelper.isHelpJobDone()) return;
+
         $.ajax({
             type: 'POST',
             url: EVENTS_ENDPOINT,
@@ -24,8 +26,8 @@ $(document).ready(function() {
             contentType: 'application/json',
             dataType: "json",
             success: function(responseData) {
-                var newMediaUrl = responseData['mediaURL'] + '?' + Math.random();
-                $(MAIN_MEDIA_ID).attr('src', newMediaUrl);
+                var newMediaURL = responseData['mediaURL'] + '?' + Math.random();
+                $(MAIN_MEDIA_ID).attr('src', newMediaURL);
             },
             error: function() {
                 console.log(arguments);

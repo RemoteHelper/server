@@ -40,7 +40,7 @@ def receive_events():
     """
     event = request.json
 
-    if not event or not sv.valid_event(event) or current_job is None:
+    if not event or not sv.valid_event(event) or current_job is None or current_job.is_complete():
         return HTTPResponse(status=400)
 
     if event_filter.blocks(event):

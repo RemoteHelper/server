@@ -12,6 +12,8 @@ With [pip](https://github.com/pypa/pip):
 $ pip install -r requirements.txt
 ```
 
+If Python 3 is not your default python version, you'll probably need to use `pip3` instead.
+
 ## Usage
 
 To run the server, simply do
@@ -20,6 +22,12 @@ To run the server, simply do
 $ python server/server.py
 ```
 
-inside the root directory.
+or
 
-If Python 3 is not your default python version, you'll probably need to use `python3` instead.
+```
+$ python3 server/server.py
+```
+
+inside the root directory, depending on your default python version.
+
+

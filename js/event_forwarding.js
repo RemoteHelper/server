@@ -9,6 +9,19 @@ $(document).ready(function() {
     nameOfMouseButton[2] = 'middle';
     nameOfMouseButton[3] = 'right';
 
+    // Add click animation every time the user clicks on the media
+    $('#media-container').on('mousedown', function (e) {
+        $('i')
+            .addClass('active')
+            .css('left', e.pageX)
+            .css('top', e.pageY);
+    });
+
+    // As soon as the animation ends, remove it
+    $('i').bind('transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd',  function () {
+       $('i').removeClass('active');
+    });
+
 
 
     /* Mouse event handling */

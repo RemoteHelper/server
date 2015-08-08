@@ -50,11 +50,12 @@ $(document).ready(function() {
 
     var pickMouseEventData = function(event) {
         var mouseEventData = pickCommonEventData(event);
+        var relativeCoordinates = getRelativeCoordinates(event);
         mouseEventData.content = {
             button: nameOfMouseButton[event.which],
             coordinates: {
-                x: event.pageX,
-                y: event.pageY
+                x: relativeCoordinates.x,
+                y: relativeCoordinates.y
             }
         };
 
@@ -65,6 +66,25 @@ $(document).ready(function() {
         return {
             type: event.type,
             timestamp: event.timeStamp
+        };
+    };
+
+    var getRelativeCoordinates = function(event) {
+        var target = event.target;
+        var root_element = document.getElementsByTagName('html')[0];
+
+        var relX = event.clientX - target.offsetLeft + root_element.scrollLeft,
+            relY = event.clientY - target.offsetTop + root_element.scrollTop;
+
+        var totalW = target.videoWidth ||  target.naturalWidth,
+            totalH = target.videoHeight || target.naturalHeight;
+
+        var scaleX = totalW / target.clientWidth,
+            scaleY = totalH / target.clientHeight;
+
+        return {
+            "x": Math.round(relX * scaleX),
+            "y": Math.round(relY * scaleY)
         };
     };
 

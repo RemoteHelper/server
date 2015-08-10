@@ -76,7 +76,7 @@ $(document).ready(function() {
         var relX = event.clientX - target.offsetLeft + root_element.scrollLeft,
             relY = event.clientY - target.offsetTop + root_element.scrollTop;
 
-        var totalW = target.videoWidth ||  target.naturalWidth,
+        var totalW = target.videoWidth || target.naturalWidth,
             totalH = target.videoHeight || target.naturalHeight;
 
         var scaleX = totalW / target.clientWidth,

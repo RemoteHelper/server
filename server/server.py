@@ -23,6 +23,41 @@ def get_js(filename):
     return static_file(filename, root='./js')
 
 
+@post('/api/help/image')
+def process_help():
+    global current_job
+
+    result = request.json
+    if not result or not sv.valid_help_request(result):
+        return HTTPResponse(status=400)
+
+    media_type = 'image'
+
+    media_url = result['mediaURL']
+    events_url = result['eventsURL']
+
+    current_job = job.Job(events_url)
+
+    page_content = page_generator.generate_page(media_url, media_type)
+    page_id = storage.save_page(page_content)
+
+    user_url = config.get_user_endpoint() + page_id
+    done_url = config.get_done_url()
+
+    return {
+        "userURL": user_url,
+        "doneURL": done_url
+    }
+
+
+@get('/resolve/<page_id>')
+def serve_static_page(page_id):
+    if not storage.contains(page_id):
+        abort(404, 'Not found')
+
+    return storage.get_page(page_id)
+
+
 @post('/events')
 def receive_events():
     """
@@ -51,12 +86,12 @@ def receive_events():
     if events_url is None:
         return HTTPResponse(status=400)
 
-    client_response = forward(events_url, event)
+    client_response = _forward(events_url, event)
 
     return client_response if client_response else HTTPResponse(status=200)
 
 
-def forward(destination, event):
+def _forward(destination, event):
     """
     Forwards the given event to the client
 
@@ -110,41 +145,6 @@ def stream():
         # the browser should then notify the user of this
         yield 'event: jobcomplete\n' + \
               'data: {"done":true}\n\n'
-
-
-@post('/api/help/image')
-def process_help():
-    global current_job
-
-    result = request.json
-    if not result or not sv.valid_help_request(result):
-        return HTTPResponse(status=400)
-
-    media_type = 'image'
-
-    media_url = result['mediaURL']
-    events_url = result['eventsURL']
-
-    current_job = job.Job(events_url)
-
-    page_content = page_generator.generate_page(media_url, media_type)
-    page_id = storage.save_page(page_content)
-
-    user_url = config.get_user_endpoint() + page_id
-    done_url = config.get_done_url()
-
-    return {
-        "userURL": user_url,
-        "doneURL": done_url
-    }
-
-
-@get('/resolve/<page_id>')
-def serve_static_page(page_id):
-    if not storage.contains(page_id):
-        abort(404, 'Not found')
-
-    return storage.get_page(page_id)
 
 
 @post('/api/done')

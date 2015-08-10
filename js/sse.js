@@ -1,4 +1,4 @@
-RemoteHelper = (function setUpJobStatusQuerier() {
+window.RemoteHelper = (function setUpJobStatusQuerier() {
     "use strict";
 
     if (!('EventSource' in window)) return;

@@ -81,9 +81,6 @@ def receive_events():
 
     events_url = job.get_events_url()
 
-    if events_url is None:
-        return HTTPResponse(status=400)
-
     client_response = _forward(events_url, event)
 
     return client_response if client_response else HTTPResponse(status=200)

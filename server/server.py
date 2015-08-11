@@ -73,7 +73,7 @@ def receive_events():
     """
     event = request.json
 
-    if not event or not sv.valid_event(event) or not job.is_running():
+    if not event or not sv.valid_event(event) or job.is_complete():
         return HTTPResponse(status=400)
 
     if event_filter.blocks(event):
@@ -155,7 +155,7 @@ def stop_help():
     error code, else return OK
     """
 
-    if not request.json or 'authURL' not in request.json or not job.is_running():
+    if not request.json or 'authURL' not in request.json or job.is_complete():
         return HTTPResponse(status=400)
 
     user_url = request.json['authURL']

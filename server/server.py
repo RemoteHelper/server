@@ -26,7 +26,7 @@ def get_js(filename):
 @post('/api/help/image')
 def process_help():
     result = request.json
-    if not result or not sv.valid_help_request(result):
+    if not result or not sv.valid_help_request(result) or job.is_running():
         return HTTPResponse(status=400)
 
     media_type = 'image'

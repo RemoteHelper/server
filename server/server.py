@@ -26,7 +26,7 @@ def get_js(filename):
 @post('/api/help/image')
 def process_help():
     result = request.json
-    if not result or not sv.valid_help_request(result) or job.is_running():
+    if not sv.valid_help_request(result) or job.is_running():
         return HTTPResponse(status=400)
 
     media_type = 'image'
@@ -73,7 +73,7 @@ def receive_events():
     """
     event = request.json
 
-    if not event or not sv.valid_event(event) or job.is_complete():
+    if not sv.valid_event(event) or job.is_complete():
         return HTTPResponse(status=400)
 
     if event_filter.blocks(event):

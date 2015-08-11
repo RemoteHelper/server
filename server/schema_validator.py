@@ -84,19 +84,19 @@ help_schema['required'] += ['eventsURL']
 
 
 def valid_event(event):
-    return _validate(event, keyboard_event_schema) or \
-        _validate(event, mouse_event_schema)
+    return _is_valid(event, keyboard_event_schema) or \
+        _is_valid(event, mouse_event_schema)
 
 
 def valid_media(payload):
-    return _validate(payload, media_schema)
+    return _is_valid(payload, media_schema)
 
 
 def valid_help_request(payload):
-    return _validate(payload, help_schema)
+    return _is_valid(payload, help_schema)
 
 
-def _validate(payload, schema):
+def _is_valid(payload, schema):
     try:
         validate(payload, schema)
         return True

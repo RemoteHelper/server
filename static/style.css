@@ -5,6 +5,10 @@ body {
 
 #media-container {
     margin: 0 auto;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 #media-container > img,

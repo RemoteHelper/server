@@ -117,29 +117,20 @@ def _forward(destination, event):
     return result if sv.valid_media(result) else None
 
 
-@get('/api/stream')
-def stream():
+@get('/api/done')
+def get_done_status():
     """
-    Server-Sent Events endpoint for the server
+    User done endpoint
 
-    Notifies the browser that we're done and that it should stop forwarding
-    events.
+    The browser will keep polling this function to know if
+    it has to stop sending events.
 
-    It should also notify the user of the next step
-    (e.g. close the tab)
+    TODO:
+    Should it also notify the user of the next step?
     """
-
-    response.content_type = 'text/event-stream'
-    response.cache_control = 'no-cache'
-
-    # make the user page reconnect in 5s whenever the connection closes
-    yield 'retry: 5000\n'
-
-    if job.is_complete():
-        # send the browser the 'jobcomplete' message
-        # the browser should then notify the user of this
-        yield 'event: jobcomplete\n' + \
-              'data: {"done":true}\n\n'
+    return {
+        'done': job.is_complete()
+    }
 
 
 @post('/api/done')

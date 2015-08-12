@@ -6,7 +6,7 @@
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 
-    <script type="text/javascript" src="/js/sse.js"></script>
+    <script type="text/javascript" src="/js/remotehelper.js"></script>
     <script type="text/javascript" src="/js/event_forwarding.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/static/style.css">

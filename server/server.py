@@ -3,14 +3,14 @@
 import requests
 from bottle import run, abort, post, get, request, HTTPResponse, static_file, response
 
-import job
+from job_container import JobContainer
 import config
 import filters
 import storage
 import page_generator
 import schema_validator as sv
 
-current_job = None
+job = JobContainer()
 
 
 @get('/static/<filename:re:.*\.css>')
@@ -25,10 +25,8 @@ def get_js(filename):
 
 @post('/api/help/image')
 def process_help():
-    global current_job
-
     result = request.json
-    if not result or not sv.valid_help_request(result):
+    if not result or not sv.valid_help_request(result) or job.is_running():
         return HTTPResponse(status=400)
 
     media_type = 'image'
@@ -36,7 +34,7 @@ def process_help():
     media_url = result['mediaURL']
     events_url = result['eventsURL']
 
-    current_job = job.Job(events_url)
+    job.create_new(events_url)
 
     page_content = page_generator.generate_page(media_url, media_type)
     page_id = storage.save_page(page_content)
@@ -75,16 +73,13 @@ def receive_events():
     """
     event = request.json
 
-    if not event or not sv.valid_event(event) or current_job is None or current_job.is_complete():
+    if not event or not sv.valid_event(event) or job.is_complete():
         return HTTPResponse(status=400)
 
     if event_filter.blocks(event):
         return HTTPResponse(status=200)
 
-    events_url = current_job.get_events_url()
-
-    if events_url is None:
-        return HTTPResponse(status=400)
+    events_url = job.get_events_url()
 
     client_response = _forward(events_url, event)
 
@@ -140,7 +135,7 @@ def stream():
     # make the user page reconnect in 5s whenever the connection closes
     yield 'retry: 5000\n'
 
-    if current_job is not None and current_job.is_complete():
+    if job.is_complete():
         # send the browser the 'jobcomplete' message
         # the browser should then notify the user of this
         yield 'event: jobcomplete\n' + \
@@ -157,7 +152,7 @@ def stop_help():
     error code, else return OK
     """
 
-    if not request.json or 'authURL' not in request.json or current_job is None:
+    if not request.json or 'authURL' not in request.json or job.is_complete():
         return HTTPResponse(status=400)
 
     user_url = request.json['authURL']
@@ -169,7 +164,7 @@ def stop_help():
     if not storage.contains(page_id):
         return HTTPResponse(status=403, body="Auth URL doesn't match!")
 
-    current_job.complete_job()
+    job.complete()
     storage.remove_page(page_id)
 
     return HTTPResponse(status=200)

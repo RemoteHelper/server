@@ -25,14 +25,14 @@ def get_js(filename):
 
 @post('/api/help/image')
 def process_help():
-    result = request.json
-    if not sv.valid_help_request(result) or job.is_running():
+    request_data = request.json
+    if not sv.valid_help_request(request_data) or job.is_running():
         return HTTPResponse(status=400)
 
     media_type = 'image'
 
-    media_url = result['mediaURL']
-    events_url = result['eventsURL']
+    media_url = request_data['mediaURL']
+    events_url = request_data['eventsURL']
 
     job.create_new(events_url)
 
@@ -113,8 +113,8 @@ def _forward(destination, event):
     if not r.text or r.json() is None:
         return None
 
-    result = r.json()
-    return result if sv.valid_media(result) else None
+    client_response = r.json()
+    return client_response if sv.valid_media(client_response) else None
 
 
 @get(config.get_done_endpoint())

@@ -25,26 +25,23 @@ def get_js(filename):
 
 @post('/api/help/image')
 def process_help():
-    result = request.json
-    if not sv.valid_help_request(result) or job.is_running():
+    request_data = request.json
+    if not sv.valid_help_request(request_data) or job.is_running():
         return HTTPResponse(status=400)
 
     media_type = 'image'
 
-    media_url = result['mediaURL']
-    events_url = result['eventsURL']
+    media_url = request_data['mediaURL']
+    events_url = request_data['eventsURL']
 
     job.create_new(events_url)
 
     page_content = page_generator.generate_page(media_url, media_type)
     page_id = storage.save_page(page_content)
 
-    user_url = config.get_user_endpoint() + page_id
-    done_url = config.get_done_url()
-
     return {
-        "userURL": user_url,
-        "doneURL": done_url
+        "userURL": config.get_user_endpoint() + page_id,
+        "doneURL": config.get_done_url()
     }
 
 
@@ -71,6 +68,7 @@ def receive_events():
     Returns: 200
     Payload: {}?
     """
+
     event = request.json
 
     if not sv.valid_event(event) or job.is_complete():
@@ -113,11 +111,11 @@ def _forward(destination, event):
     if not r.text or r.json() is None:
         return None
 
-    result = r.json()
-    return result if sv.valid_media(result) else None
+    client_response = r.json()
+    return client_response if sv.valid_media(client_response) else None
 
 
-@get('/api/done')
+@get(config.get_done_endpoint())
 def get_done_status():
     """
     User done endpoint
@@ -133,7 +131,7 @@ def get_done_status():
     }
 
 
-@post('/api/done')
+@post(config.get_done_endpoint())
 def stop_help():
     """
     Stop forwarding events to the client.
@@ -143,14 +141,11 @@ def stop_help():
     error code, else return OK
     """
 
-    if not request.json or 'authURL' not in request.json or job.is_complete():
+    request_data = request.json
+    if not request_data or 'authURL' not in request_data or job.is_complete():
         return HTTPResponse(status=400)
 
-    user_url = request.json['authURL']
-    if user_url.endswith('/'):
-        user_url = user_url[:-1]
-
-    page_id = user_url.split('/')[-1]
+    page_id = _get_page_id(request_data['authURL'])
 
     if not storage.contains(page_id):
         return HTTPResponse(status=403, body="Auth URL doesn't match!")
@@ -159,6 +154,14 @@ def stop_help():
     storage.remove_page(page_id)
 
     return HTTPResponse(status=200)
+
+
+def _get_page_id(auth_url):
+    return _remove_trailing_slash(auth_url).split('/')[-1]
+
+
+def _remove_trailing_slash(url):
+    return url[:-1] if url.endswith('/') else url
 
 
 if __name__ == "__main__":

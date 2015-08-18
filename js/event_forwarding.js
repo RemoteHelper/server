@@ -92,7 +92,7 @@ $(document).ready(function() {
 
     /* Keyboard events handler */
     var keydownHandler = function(event) {
-        if (isJustAModifierKey(event)) return;
+        if (isJustAModifierKey(event.which)) return;
 
         notifyEvent(pickKeydownData(event));
     };
@@ -109,7 +109,7 @@ $(document).ready(function() {
         return keydownData;
     };
 
-    var isJustAModifierKey = function(event) {
+    var isJustAModifierKey = function(keyIdentifier) {
         // see http://unixpapa.com/js/key.html
         return [
             16, // Shift
@@ -118,7 +118,7 @@ $(document).ready(function() {
             91, // Left Command (Safari)
             224, // Left and Right Command (Firefox)
             93 // Right Command (Safari)
-        ].indexOf(event.which) !== -1;
+        ].indexOf(keyIdentifier) !== -1;
     };
 
 

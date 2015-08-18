@@ -39,12 +39,9 @@ def process_help():
     page_content = page_generator.generate_page(media_url, media_type)
     page_id = storage.save_page(page_content)
 
-    user_url = config.get_user_endpoint() + page_id
-    done_url = config.get_done_url()
-
     return {
-        "userURL": user_url,
-        "doneURL": done_url
+        "userURL": config.get_user_endpoint() + page_id,
+        "doneURL": config.get_done_url()
     }
 
 
@@ -71,6 +68,7 @@ def receive_events():
     Returns: 200
     Payload: {}?
     """
+
     event = request.json
 
     if not sv.valid_event(event) or job.is_complete():
@@ -143,10 +141,11 @@ def stop_help():
     error code, else return OK
     """
 
-    if not request.json or 'authURL' not in request.json or job.is_complete():
+    request_data = request.json
+    if not request_data or 'authURL' not in request_data or job.is_complete():
         return HTTPResponse(status=400)
 
-    page_id = _get_page_id(request.json['authURL'])
+    page_id = _get_page_id(request_data['authURL'])
 
     if not storage.contains(page_id):
         return HTTPResponse(status=403, body="Auth URL doesn't match!")

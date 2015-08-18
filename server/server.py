@@ -117,7 +117,7 @@ def _forward(destination, event):
     return result if sv.valid_media(result) else None
 
 
-@get('/api/done')
+@get(config.get_done_endpoint())
 def get_done_status():
     """
     User done endpoint
@@ -133,7 +133,7 @@ def get_done_status():
     }
 
 
-@post('/api/done')
+@post(config.get_done_endpoint())
 def stop_help():
     """
     Stop forwarding events to the client.

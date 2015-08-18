@@ -146,11 +146,7 @@ def stop_help():
     if not request.json or 'authURL' not in request.json or job.is_complete():
         return HTTPResponse(status=400)
 
-    user_url = request.json['authURL']
-    if user_url.endswith('/'):
-        user_url = user_url[:-1]
-
-    page_id = user_url.split('/')[-1]
+    page_id = _get_page_id(request.json['authURL'])
 
     if not storage.contains(page_id):
         return HTTPResponse(status=403, body="Auth URL doesn't match!")
@@ -159,6 +155,14 @@ def stop_help():
     storage.remove_page(page_id)
 
     return HTTPResponse(status=200)
+
+
+def _get_page_id(auth_url):
+    return _remove_trailing_slash(auth_url).split('/')[-1]
+
+def _remove_trailing_slash(url):
+    return url[:-1] if url.endswith('/') else url
+
 
 
 if __name__ == "__main__":

@@ -159,9 +159,9 @@ def stop_help():
 def _get_page_id(auth_url):
     return _remove_trailing_slash(auth_url).split('/')[-1]
 
+
 def _remove_trailing_slash(url):
     return url[:-1] if url.endswith('/') else url
-
 
 
 if __name__ == "__main__":

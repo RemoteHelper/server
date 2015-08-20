@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from server.job import Job, NullJob
+from remote_helper.job import Job, NullJob
 
 class JobTest(TestCase):
     def setUp(self):

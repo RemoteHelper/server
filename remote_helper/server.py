@@ -3,12 +3,12 @@
 import requests
 from bottle import run, abort, post, get, request, HTTPResponse, static_file, response
 
-from job_container import JobContainer
-import config
-import filters
-import storage
-import page_generator
-import schema_validator as sv
+from remote_helper.job_container import JobContainer
+from remote_helper import config
+from remote_helper import filters
+from remote_helper import storage
+from remote_helper import page_generator
+from remote_helper import schema_validator as sv
 
 job_container = JobContainer()
 

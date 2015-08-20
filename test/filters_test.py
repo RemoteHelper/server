@@ -1,6 +1,6 @@
 import unittest
 
-from server import filters
+from remote_helper import filters
 
 
 class DefaultFilterTest(unittest.TestCase):

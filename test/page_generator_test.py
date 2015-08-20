@@ -1,7 +1,7 @@
 import unittest
 
 from bottle import template
-from server import page_generator as generator
+from remote_helper import page_generator as generator
 
 image_template_path = 'templates/simple_image_page'
 video_template_path = 'templates/simple_video_page'

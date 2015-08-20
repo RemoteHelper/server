@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from server.job_container import JobContainer
-from server.job import NullJob, Job
+from remote_helper.job_container import JobContainer
+from remote_helper.job import NullJob, Job
 
 class JobContainerTest(TestCase):
     def setUp(self):

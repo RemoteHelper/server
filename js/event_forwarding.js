@@ -83,8 +83,8 @@ $(document).ready(function() {
             scaleY = totalH / target.clientHeight;
 
         return {
-            "x": Math.round(relX * scaleX),
-            "y": Math.round(relY * scaleY)
+            x: Math.round(relX * scaleX),
+            y: Math.round(relY * scaleY)
         };
     };
 

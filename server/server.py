@@ -10,7 +10,7 @@ import storage
 import page_generator
 import schema_validator as sv
 
-job = JobContainer()
+job_container = JobContainer()
 
 
 @get('/static/<filename:re:.*\.css>')
@@ -26,7 +26,8 @@ def get_js(filename):
 @post('/api/help/image')
 def process_help():
     request_data = request.json
-    if not sv.valid_help_request(request_data) or job.is_running():
+    current_job = job_container.get()
+    if not sv.valid_help_request(request_data) or current_job.is_running():
         return HTTPResponse(status=400)
 
     media_type = 'image'
@@ -34,7 +35,7 @@ def process_help():
     media_url = request_data['mediaURL']
     events_url = request_data['eventsURL']
 
-    job.create_new(events_url)
+    job_container.create_new_job(events_url)
 
     page_content = page_generator.generate_page(media_url, media_type)
     page_id = storage.save_page(page_content)
@@ -71,13 +72,14 @@ def receive_events():
 
     event = request.json
 
-    if not sv.valid_event(event) or job.is_complete():
+    current_job = job_container.get()
+    if not sv.valid_event(event) or current_job.is_complete():
         return HTTPResponse(status=400)
 
     if event_filter.blocks(event):
         return HTTPResponse(status=200)
 
-    events_url = job.get_events_url()
+    events_url = current_job.events_url
 
     client_response = _forward(events_url, event)
 
@@ -126,9 +128,12 @@ def get_done_status():
     TODO:
     Should it also notify the user of the next step?
     """
-    return {
-        'done': job.is_complete()
-    }
+    current_job = job_container.get()
+
+    if current_job.is_complete():
+        current_job.resolve()
+
+    return current_job.done_status
 
 
 @post(config.get_done_endpoint())
@@ -142,7 +147,8 @@ def stop_help():
     """
 
     request_data = request.json
-    if not request_data or 'authURL' not in request_data or job.is_complete():
+    current_job = job_container.get()
+    if not request_data or 'authURL' not in request_data or current_job.is_complete():
         return HTTPResponse(status=400)
 
     page_id = _get_page_id(request_data['authURL'])
@@ -150,7 +156,10 @@ def stop_help():
     if not storage.contains(page_id):
         return HTTPResponse(status=403, body="Auth URL doesn't match!")
 
-    job.complete()
+    if 'doneText' in request_data:
+        current_job.done_text = request.json['doneText']
+
+    current_job.complete()
     storage.remove_page(page_id)
 
     return HTTPResponse(status=200)

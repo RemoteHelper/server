@@ -24,7 +24,3 @@ class JobContainerTest(TestCase):
 
     def test_exposes_the_currently_conatined_job(self):
         self.assertIs(self.a_job_container.get(), self.a_job_container._job)
-
-
-if __name__ == '__main__':
-    unittest.main()

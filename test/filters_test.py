@@ -39,7 +39,3 @@ class DefaultFilterTest(unittest.TestCase):
             }
         }
         self.assertEqual(self.filter.blocks(invalid_event), False)
-
-
-if __name__ == '__main__':
-    unittest.main()

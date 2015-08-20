@@ -25,7 +25,3 @@ class StorageTest(unittest.TestCase):
 
     def test_storage_should_raise_key_error_on_non_existing_key_deletion(self):
         self.assertRaises(Exception, self.storage.remove_page, 'bogus_key')
-
-
-if __name__ == '__main__':
-    unittest.main()

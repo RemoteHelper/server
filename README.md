@@ -19,13 +19,13 @@ If Python 3 is not your default python version, you'll probably need to use `pip
 To run the server, simply do
 
 ```
-$ python server/server.py
+$ python remote_helper/server.py
 ```
 
 or
 
 ```
-$ python3 server/server.py
+$ python3 remote_helper/server.py
 ```
 
 inside the root directory, depending on your default python version.

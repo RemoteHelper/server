@@ -1,4 +1,4 @@
-from server.job import Job, NullJob
+from remote_helper.job import Job, NullJob
 
 class JobContainer:
     """

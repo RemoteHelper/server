@@ -1,6 +1,6 @@
 import unittest
 
-from server import storage
+from remote_helper import storage
 
 
 class StorageTest(unittest.TestCase):

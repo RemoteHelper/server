@@ -19,7 +19,3 @@ class PageGeneratorTest(unittest.TestCase):
     def test_generated_pages_should_default_to_video_if_unknown_media_type_is_given(self):
         self.assertEqual(generator.generate_page('some_url', '???'),
                          template(video_template_path, media_url='some_url'))
-
-
-if __name__ == '__main__':
-    unittest.main()

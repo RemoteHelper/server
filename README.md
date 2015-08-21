@@ -1,6 +1,12 @@
-# RemoteHelper [![Build Status](https://travis-ci.org/RemoteHelper/server.svg)](https://travis-ci.org/RemoteHelper/server)
+# Remote Helper
 
-## Prerequisites
+[![Build Status](https://travis-ci.org/RemoteHelper/server.svg)](https://travis-ci.org/RemoteHelper/server)
+
+---
+
+**Remote Helper** is an automated service that lets you talk to your users through a very simple API.
+
+## Requirements
 
 This project is done in Python 3, so you'll need to install it / upgrade first.
 
@@ -29,5 +35,15 @@ $ python3 remote_helper/server.py
 ```
 
 inside the root directory, depending on your default python version.
+
+## Contributing
+
+Contributors are welcome. Please fork the repository and send a pull request to the master branch.
+
+Additionally, you can read the [*Contributing*](./CONTRIBUTING.md) file.
+
+## License
+
+The Remote Helper server is released under the MIT License. For more information, see the [License](./LICENSE)
 
 
